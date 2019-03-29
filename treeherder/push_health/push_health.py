@@ -111,11 +111,17 @@ def get_push_failures(push, option_map):
                 'confidence': 0,
             }
             tests[test_key] = line
+
+        # This ``test`` was either just added above, or already existed in the ``tests``
+        # list in a previous iteration through ``failure_lines``
         test = tests[test_key]
         test['logLines'].append(failure_line.to_mozlog_format())
         if not next((find_job for find_job in test['failJobs'] if find_job['id'] == job.id), False):
             test['failJobs'].append(model_to_dict(job, fields=job_fields))
 
+    # Each line of the sorted list that is returned here represents one test file per platform/
+    # config.  Each line will have at least one failing job, but may have several
+    # passing/failing jobs associated with it.
     return sorted(tests.values(), key=lambda k: k['testName'])
 
 

@@ -30,6 +30,12 @@ def set_matching_passed_jobs(failures, push):
             machine_platform=job['machine_platform'],
             job_type=job['job_type'],
         ))
+    # ``query`` here will end up being a set of OR conditions for each combination of
+    # platform/config/job_type for the failed jobs.  This OR condition will give us a
+    # list of passing versions of those same job conditions.
+    # Said another way: ``query`` will end up being a bunch of OR conditions for each
+    # type of job we want to find that's in a "success" state.  For instance:
+    # (platform=x, config=y, job_type=z OR platform=a, config=b, job_type=c OR ...)
     query = query_conditions.pop()
     for condition in query_conditions:
         query |= condition
@@ -56,6 +62,8 @@ def set_matching_passed_jobs(failures, push):
             # A failure will have the same job_key for all jobs in this push, so use the first one
             job_key = get_job_key(failure['failJobs'][0])
             if job_key in passing_job_map:
+                # This sets the ``passJobs`` key in the ``failures`` object that was passed in,
+                # which is then returned from the API.
                 failure['passJobs'] = passing_job_map[job_key]
 
 
