@@ -20,7 +20,6 @@ import {
 } from '../../helpers/location';
 import { isUnclassifiedFailure } from '../../helpers/job';
 import PushModel from '../../models/push';
-import JobModel from '../../models/job';
 import { reloadOnChangeParameters } from '../../helpers/filter';
 import { withNotifications } from '../../shared/context/Notifications';
 
@@ -62,8 +61,6 @@ export class PushesClass extends React.Component {
       updateUrlFromchange: this.updateUrlFromchange,
       getNextPushes: this.getNextPushes,
       handleUrlChanges: this.handleUrlChanges,
-      getGeckoDecisionJob: this.getGeckoDecisionJob,
-      getGeckoDecisionTaskId: this.getGeckoDecisionTaskId,
     };
   }
 
@@ -149,35 +146,6 @@ export class PushesClass extends React.Component {
       setUrlParam('startdate', null);
     }
     this.fetchPushes(count).then(this.updateUrlFromchange);
-  };
-
-  getGeckoDecisionJob = pushId => {
-    const { jobMap } = this.state;
-
-    return Object.values(jobMap).find(
-      job =>
-        job.push_id === pushId &&
-        job.platform === 'gecko-decision' &&
-        job.state === 'completed' &&
-        job.job_type_symbol === 'D',
-    );
-  };
-
-  getGeckoDecisionTaskId = (pushId, repoName) => {
-    const decisionTask = this.getGeckoDecisionJob(pushId);
-    if (decisionTask) {
-      return JobModel.get(repoName, decisionTask.id).then(job => {
-        // this failure case is unlikely, but I guess you
-        // never know
-        if (!job.taskcluster_metadata) {
-          return Promise.reject('Decision task missing taskcluster metadata');
-        }
-        return job.taskcluster_metadata.task_id;
-      });
-    }
-
-    // no decision task, we fail
-    return Promise.reject('No decision task');
   };
 
   getLastModifiedJobTime = () => {
@@ -434,8 +402,6 @@ export function withPushes(Component) {
               context.recalculateUnclassifiedCounts
             }
             getNextPushes={context.getNextPushes}
-            getGeckoDecisionJob={context.getGeckoDecisionJob}
-            getGeckoDecisionTaskId={context.getGeckoDecisionTaskId}
           />
         )}
       </PushesContext.Consumer>

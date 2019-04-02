@@ -303,10 +303,10 @@ class Push extends React.Component {
   };
 
   showRunnableJobs = async () => {
-    const { push, repoName, getGeckoDecisionTaskId, notify } = this.props;
+    const { push, repoName, notify } = this.props;
 
     try {
-      const decisionTaskId = await getGeckoDecisionTaskId(push.id, repoName);
+      const decisionTaskId = await PushModel.getDecisionTaskId(push.id, notify);
       const jobList = await RunnableJobModel.getList(repoName, {
         decision_task_id: decisionTaskId,
         push_id: push.id,
@@ -340,7 +340,7 @@ class Push extends React.Component {
   };
 
   showFuzzyJobs = async () => {
-    const { push, repoName, getGeckoDecisionTaskId, notify } = this.props;
+    const { push, repoName, notify } = this.props;
     const createRegExp = (str, opts) =>
       new RegExp(str.raw[0].replace(/\s/gm, ''), opts || '');
     const excludedJobNames = createRegExp`
@@ -353,7 +353,7 @@ class Push extends React.Component {
       test-verify|test-windows10-64-ux|toolchain|upload-generated-sources)`;
 
     try {
-      const decisionTaskId = await getGeckoDecisionTaskId(push.id, repoName);
+      const decisionTaskId = await PushModel.getDecisionTaskId(push.id, notify);
 
       notify('Fetching runnable jobs... This could take a while...');
       let fuzzyJobList = await RunnableJobModel.getList(repoName, {
@@ -532,7 +532,6 @@ Push.propTypes = {
   updateJobMap: PropTypes.func.isRequired,
   recalculateUnclassifiedCounts: PropTypes.func.isRequired,
   allUnclassifiedFailureCount: PropTypes.number.isRequired,
-  getGeckoDecisionTaskId: PropTypes.func.isRequired,
   duplicateJobsVisible: PropTypes.bool.isRequired,
   groupCountsExpanded: PropTypes.bool.isRequired,
   notify: PropTypes.func.isRequired,

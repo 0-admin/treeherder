@@ -21,10 +21,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare } from '@fortawesome/free-regular-svg-icons';
 
 import { formatTaskclusterError } from '../helpers/errorMessage';
+import PushModel from '../models/push';
 import TaskclusterModel from '../models/taskcluster';
 import { withNotifications } from '../shared/context/Notifications';
-
-import { withPushes } from './context/Pushes';
 
 class CustomJobActions extends React.PureComponent {
   constructor(props) {
@@ -44,36 +43,35 @@ class CustomJobActions extends React.PureComponent {
     };
   }
 
-  componentDidMount() {
-    const { getGeckoDecisionTaskId, pushId, job } = this.props;
+  async componentDidMount() {
+    const { pushId, job, notify } = this.props;
+    const decisionTaskId = await PushModel.getDecisionTaskId(pushId, notify);
 
-    getGeckoDecisionTaskId(pushId).then(decisionTaskId => {
-      TaskclusterModel.load(decisionTaskId, job).then(results => {
-        const {
+    TaskclusterModel.load(decisionTaskId, job).then(results => {
+      const {
+        originalTask,
+        originalTaskId,
+        staticActionVariables,
+        actions,
+      } = results;
+      const actionOptions = actions.map(action => ({
+        value: action,
+        label: action.title,
+      }));
+
+      this.setState(
+        {
           originalTask,
           originalTaskId,
-          staticActionVariables,
           actions,
-        } = results;
-        const actionOptions = actions.map(action => ({
-          value: action,
-          label: action.title,
-        }));
-
-        this.setState(
-          {
-            originalTask,
-            originalTaskId,
-            actions,
-            staticActionVariables,
-            actionOptions,
-            selectedActionOption: actionOptions[0],
-          },
-          () => this.updateSelectedAction(actions[0]),
-        );
-      });
-      this.setState({ decisionTaskId });
+          staticActionVariables,
+          actionOptions,
+          selectedActionOption: actionOptions[0],
+        },
+        () => this.updateSelectedAction(actions[0]),
+      );
     });
+    this.setState({ decisionTaskId });
   }
 
   onChangeAction = actionOption => {
@@ -294,7 +292,6 @@ CustomJobActions.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
   notify: PropTypes.func.isRequired,
   toggle: PropTypes.func.isRequired,
-  getGeckoDecisionTaskId: PropTypes.func.isRequired,
   job: PropTypes.object,
 };
 
@@ -302,4 +299,4 @@ CustomJobActions.defaultProps = {
   job: null,
 };
 
-export default withNotifications(withPushes(CustomJobActions));
+export default withNotifications(CustomJobActions);

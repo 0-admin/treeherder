@@ -87,7 +87,9 @@ export default class PushModel {
     return JobModel.getList(repo, params, { fetch_all: true });
   }
 
-  static triggerMissingJobs(decisionTaskId) {
+  static async triggerMissingJobs(pushId, notify) {
+    const decisionTaskId = await PushModel.getDecisionTaskId(pushId, notify);
+
     return TaskclusterModel.load(decisionTaskId).then(results => {
       const actionTaskId = slugid();
       const missingTestsTask = results.actions.find(
@@ -103,13 +105,17 @@ export default class PushModel {
         input: {},
         staticActionVariables: results.staticActionVariables,
       }).then(
-        () =>
-          `Request sent to trigger missing jobs via actions.json (${actionTaskId})`,
+        notify(
+          `Request sent to trigger missing jobs (${actionTaskId})`,
+          'success',
+        ),
       );
     });
   }
 
-  static triggerAllTalosJobs(times, decisionTaskId) {
+  static async triggerAllTalosJobs(times, pushId, notify) {
+    const decisionTaskId = await PushModel.getDecisionTaskId(pushId, notify);
+
     return TaskclusterModel.load(decisionTaskId).then(results => {
       const actionTaskId = slugid();
       const allTalosTask = results.actions.find(
@@ -159,15 +165,25 @@ export default class PushModel {
     );
   }
 
-  static getDecisionTaskId(pushId) {
-    const map = PushModel.getDecisionTaskMap([pushId]);
+  static async getDecisionTaskId(pushId, notify) {
+    const taskIdMap = await PushModel.getDecisionTaskMap([pushId], notify);
 
-    return map[pushId];
+    return taskIdMap[pushId];
   }
 
-  static getDecisionTaskMap(pushIds) {
-    return getData(
+  static async getDecisionTaskMap(pushIds, notify) {
+    const { data, failureStatus } = await getData(
       getProjectUrl(`${pushEndpoint}decisiontask/?push_ids=${pushIds}`),
     );
+
+    if (failureStatus) {
+      const msg = `Error getting Gecko Decision Task Ids: ${failureStatus}: ${data}`;
+
+      if (notify) {
+        notify(msg, 'danger', { sticky: true });
+      }
+      throw Error(msg);
+    }
+    return data;
   }
 }
