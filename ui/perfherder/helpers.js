@@ -420,7 +420,7 @@ const modifyAlert = (alert, modification) =>
 
 export const alertIsOfState = (alert, phAlertStatus) =>
   alert.status === phAlertStatus.id;
-
+// TODO remove
 export const toggleStar = alert => {
   const toggledStar = !alert.starred;
   modifyAlert(alert, {
