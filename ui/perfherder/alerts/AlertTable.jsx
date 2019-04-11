@@ -37,10 +37,24 @@ export class AlertTable extends React.Component {
     this.props.$rootScope.$apply();
   };
 
+  // TODO figure out how to structure this - alert.selected needs to be updated
+  // do we need to use alert.visible as per updateAlertVisibility in controller?
+  selectAlert = () => {
+    const { alertSummary: oldAlertSummary } = this.state;
+    const alertSummary = { ...oldAlertSummary };
+
+    if (alertSummary.alerts.every(alert => !alert.visible || alert.selected)) {
+        alertSummary.allSelected = true;
+    } else {
+        alertSummary.allSelected = false;
+    }
+    this.props.$rootScope.$apply();    
+  };
+
   render() {
     const { user, $rootScope, repos } = this.props;
     const { alertSummary } = this.state;
-
+    console.log(alertSummary);
     return (
       <Container fluid className="px-0">
         <Form>
@@ -78,7 +92,34 @@ export class AlertTable extends React.Component {
               </tr>
             </thead>
             <tbody>
-              <tr />
+              {/* // TODO orderBy: ['-starred', 'title'] */}
+              {alertSummary.alerts.map(alert => (
+              alert.visible &&
+              <tr key={alert.id}>
+                <td>
+                <FormGroup check>
+                    <Label check>
+                      <Input
+                        type="checkbox"
+                        disabled={!user.isStaff}
+                        // onClick={this.selectAlert}
+                      />
+                    </Label>
+                  </FormGroup>
+                </td>
+              {/* 
+              <td class="alert-checkbox">
+                <input type="checkbox" ng-disabled="!user.isStaff" ng-model="alert.selected" ng-change="alertSelected(alertSummary)"/>
+              </td>
+              <td class="alert-labels">
+                <a ng-attr-title="{{alert.starred ? 'Starred': 'Not starred'}}"
+                  ng-class="{'visible': alert.starred}"
+                  ng-disabled="!user.isStaff"
+                  ng-click="toggleStar(alert)">
+                  <i ng-class="{'fas fa-star': alert.starred, 'far fa-star': !alert.starred}"></i>
+                </a>
+              </td> */}
+              </tr>))}
             </tbody>
           </Table>
         </Form>

@@ -178,6 +178,7 @@ perf.controller('AlertsCtrl', [
                 alert.selected = alert.visible && alertSummary.allSelected;
             });
         };
+        // TODO remove
         $scope.alertSelected = function (alertSummary) {
             if (alertSummary.alerts.every(alert => !alert.visible || alert.selected)) {
                 alertSummary.allSelected = true;
