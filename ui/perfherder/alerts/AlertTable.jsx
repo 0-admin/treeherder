@@ -80,10 +80,17 @@ export class AlertTable extends React.Component {
             </thead>
             <tbody>
               {/* // TODO orderBy: ['-starred', 'title'] */}
-              {alertSummary.alerts.map(alert => (
-              alert.visible &&
-              <AlertTableRow key={alert.id} alertSummary={alertSummary} alert={alert} user={user} />
-              ))}
+              {alertSummary.alerts.map(
+                alert =>
+                  alert.visible && (
+                    <AlertTableRow
+                      key={alert.id}
+                      alertSummary={alertSummary}
+                      alert={alert}
+                      user={user}
+                    />
+                  ),
+              )}
             </tbody>
           </Table>
         </Form>

@@ -316,12 +316,20 @@ th {
   color: #23527c;
 }
 
+/* TODO remove
 .compare-table td.alert-labels a {
   visibility: hidden;
 }
 
 .compare-table tr:hover td.alert-labels a {
   visibility: visible;
+} */
+
+.alert-row td.alert-labels span {
+  visibility: hidden;  
+}
+.alert-row:hover td.alert-labels span {
+  visibility: visible;  
 }
 
 .button-panel {

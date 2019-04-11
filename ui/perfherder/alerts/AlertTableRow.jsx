@@ -1,15 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Container, Form, FormGroup, Label, Input, Table } from 'reactstrap';
+import { FormGroup, Label, Input } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStarRegular, faStarSolid } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
+
+import { update } from '../../helpers/http';
+import { getApiUrl } from '../../helpers/url';
+import { endpoints } from '../constants';
 
 // TODO remove $stateParams and $state after switching to react router
 export default class AlertTableRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alert: null,
+      alert: this.props.alert,
+      starred: this.props.alert.starred,
     };
   }
 
@@ -20,42 +26,54 @@ export default class AlertTableRow extends React.Component {
     const alertSummary = { ...oldAlertSummary };
 
     if (alertSummary.alerts.every(alert => !alert.visible || alert.selected)) {
-        alertSummary.allSelected = true;
+      alertSummary.allSelected = true;
     } else {
-        alertSummary.allSelected = false;
+      alertSummary.allSelected = false;
     }
-    // this.props.$rootScope.$apply();    
+    // this.props.$rootScope.$apply();
+  };
+
+  // TODO error handling
+  modifyAlert = (alert, modification) =>
+    update(getApiUrl(`${endpoints.alert}${alert.id}/`), modification);
+
+  toggleStar = async () => {
+    const { starred, alert } = this.state;
+    const updatedStar = {
+      starred: !starred,
+    };
+    await this.modifyAlert(alert, updatedStar);
+    this.setState(updatedStar);
   };
 
   render() {
-    const { alertSummary, user, alert } = this.props;
+    const { user, alert } = this.props;
+    const { starred } = this.state;
+
     return (
-      <tr>
+      <tr className="alert-row">
         <td>
-        <FormGroup check>
+          <FormGroup check>
             <Label check>
               <Input
                 type="checkbox"
                 disabled={!user.isStaff}
-                // onClick={this.selectAlert}
+                // onClick={() => console.log('selected')}
               />
+              {/* <span className="alert-labels" onClick={(event) => { event.preventDefault(); this.setState({ starred : !starred }) }}>
+                <FontAwesomeIcon title={starred ? "starred" : "not starred"} icon={starred ? faStarSolid : faStarRegular} />
+              </span> */}
             </Label>
           </FormGroup>
         </td>
-        <td>
-          <span role="button">
-            {/* <FontAwesomeIcon icon={faExternalLinkAlt} /> */}
+        <td className="alert-labels">
+          <span className={starred ? 'visible' : ''} onClick={this.toggleStar}>
+            <FontAwesomeIcon
+              title={starred ? 'starred' : 'not starred'}
+              icon={starred ? faStarSolid : faStarRegular}
+            />
           </span>
         </td>
-      {/* 
-      <td class="alert-labels">
-        <a ng-attr-title="{{alert.starred ? 'Starred': 'Not starred'}}"
-          ng-class="{'visible': alert.starred}"
-          ng-disabled="!user.isStaff"
-          ng-click="toggleStar(alert)">
-          <i ng-class="{'fas fa-star': alert.starred, 'far fa-star': !alert.starred}"></i>
-        </a>
-      </td> */}
       </tr>
     );
   }
@@ -64,7 +82,7 @@ export default class AlertTableRow extends React.Component {
 AlertTableRow.propTypes = {
   alertSummary: PropTypes.shape({}).isRequired,
   user: PropTypes.shape({}),
-  alert: PropTypes.shape({}).isRequired,  
+  alert: PropTypes.shape({}).isRequired,
 };
 
 AlertTableRow.defaultProps = {
