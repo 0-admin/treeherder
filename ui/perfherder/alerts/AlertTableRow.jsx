@@ -68,6 +68,24 @@ export default class AlertTableRow extends React.Component {
     );
   };
 
+  getTitleText = (alert, alertStatus) => {
+    let statusColor = '';
+    if (alertStatus === 'invalid') {
+      statusColor = 'text-danger';
+    }
+    if (alertStatus === 'untriaged') {
+      statusColor = 'text-success';
+    }
+
+    return (
+      <span>
+        {`${alert.title} (`}
+        <span className={statusColor}>{alertStatus}</span>
+        {alert.related_summary_id && this.getReassignment(alert)})
+      </span>
+    );
+  };
+
   render() {
     const { user, alert, alertSummary } = this.props;
     const { starred } = this.state;
@@ -77,13 +95,6 @@ export default class AlertTableRow extends React.Component {
       ? `Classified by ${alert.classifier_email}`
       : 'Classified automatically';
 
-    let statusColor = '';
-    if (alertStatus === 'invalid') {
-      statusColor = 'text-danger';
-    }
-    if (alertStatus === 'untriaged') {
-      statusColor = 'text-success';
-    }
     return (
       <tr className="alert-row">
         <td className="alert-checkbox">
@@ -109,16 +120,6 @@ export default class AlertTableRow extends React.Component {
           </span>
         </td>
         {/* <td class="alert-title">
-          <span ng-show="alert.related_summary_id">
-            <!-- Reassigned or downstream *to* another alert -->
-            <span ng-if="alert.related_summary_id !== alertSummary.id">
-              to <a href="#/alerts?id={{alert.related_summary_id}}" target="_blank" rel="noopener">alert #{{alert.related_summary_id}}</a>
-            </span>
-            <!-- Reassigned or downstream *from* the another alert -->
-            <span ng-if="alert.related_summary_id === alertSummary.id">
-              from <a href="#/alerts?id={{alert.summary_id}}" target="_blank" rel="noopener" >alert #{{alert.summary_id}}</a>
-            </span>
-          </span>)&nbsp;&nbsp;
           <span class="result-links">
             <a href="{{getGraphsURL(alert, alertSummary.resultSetMetadata.timeRange, alertSummary.repository, alertSummary.framework)}}" target="_blank" rel="noopener">graph</a>
             <span ng-if="alert.series_signature.has_subtests"> · </span>
@@ -127,13 +128,13 @@ export default class AlertTableRow extends React.Component {
         </td> */}
         <td className="alert-title">
           {alertStatus !== 'untriaged' ? (
-            <SimpleToolTip text={alert.title} tooltipText={tooltipText} />
+            <SimpleToolTip
+              text={this.getTitleText(alert, alertStatus)}
+              tooltipText={tooltipText}
+            />
           ) : (
-            <span>{alert.title}</span>
-          )}{' '}
-          (<span className={statusColor}>{alertStatus}</span>
-          {alert.related_summary_id && this.getReassignment(alert)}
-          )
+            <span>{this.getTitleText(alert, alertStatus)}</span>
+          )}
         </td>
       </tr>
     );
