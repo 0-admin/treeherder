@@ -48,7 +48,10 @@ export class AlertTable extends React.Component {
           <Table>
             <thead>
               <tr className="bg-lightgray">
-                <th colSpan="6" className="text-left alert-summary-header-element">
+                <th
+                  colSpan="6"
+                  className="text-left alert-summary-header-element"
+                >
                   <FormGroup check>
                     <Label check>
                       <Input

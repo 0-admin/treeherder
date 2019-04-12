@@ -48,15 +48,35 @@ export default class AlertTableRow extends React.Component {
     this.setState(updatedStar);
   };
 
+  getReassignment = alert => {
+    let text = 'to';
+    let alertId = alert.related_summary_id;
+
+    if (alert.related_summary_id === this.props.alertSummary.id) {
+      text = 'from';
+      alertId = alert.summary_id;
+    }
+    return (
+      <span>
+        {` ${text} `}
+        <a
+          href={`#/alerts?id=${alertId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >{`alert #${alertId}`}</a>
+      </span>
+    );
+  };
+
   render() {
-    const { user, alert } = this.props;
+    const { user, alert, alertSummary } = this.props;
     const { starred } = this.state;
     // TODO turn into a helper
     const alertStatus = getAlertStatus(alert);
     const tooltipText = alert.classifier_email
       ? `Classified by ${alert.classifier_email}`
       : 'Classified automatically';
-    
+
     let statusColor = '';
     if (alertStatus === 'invalid') {
       statusColor = 'text-danger';
@@ -110,9 +130,10 @@ export default class AlertTableRow extends React.Component {
             <SimpleToolTip text={alert.title} tooltipText={tooltipText} />
           ) : (
             <span>{alert.title}</span>
-          )}
-          {' '}
-          (<span className={statusColor}>{alertStatus}</span>)
+          )}{' '}
+          (<span className={statusColor}>{alertStatus}</span>
+          {alert.related_summary_id && this.getReassignment(alert)}
+          )
         </td>
       </tr>
     );
