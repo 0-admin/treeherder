@@ -48,7 +48,7 @@ export class AlertTable extends React.Component {
           <Table>
             <thead>
               <tr className="bg-lightgray">
-                <th className="text-left alert-summary-header-element">
+                <th colSpan="6" className="text-left alert-summary-header-element">
                   <FormGroup check>
                     <Label check>
                       <Input
@@ -60,11 +60,6 @@ export class AlertTable extends React.Component {
                     </Label>
                   </FormGroup>
                 </th>
-                <th />
-                <th />
-                <th />
-                <th />
-                <th />
                 <th className="table-width-sm align-top font-weight-normal">
                   <StatusDropdown
                     alertSummary={alertSummary}

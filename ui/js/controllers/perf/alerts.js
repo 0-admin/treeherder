@@ -444,7 +444,7 @@ perf.controller('AlertsCtrl', [
 
         // Alert functions
         $scope.phAlertStatusMap = phAlertStatusMap;
-
+        // TODO remove
         $scope.getAlertStatusText = getAlertStatusText;
         $scope.getGraphsURL = getGraphsURL;
         $scope.getSubtestsURL = getSubtestsURL;

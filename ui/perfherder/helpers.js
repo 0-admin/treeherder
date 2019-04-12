@@ -18,6 +18,7 @@ import {
   tValueCareMin,
   tValueConfidence,
   noiseMetricTitle,
+  alertSummaryStatus,
 } from './constants';
 
 export const displayNumber = input =>
@@ -361,7 +362,7 @@ const Alert = (alertData, optionCollectionMap) => ({
     includePlatformInName: true,
   }),
 });
-
+// TODO remove
 export const getAlertStatusText = alert =>
   Object.values(phAlertStatusMap).find(status => status.id === alert.status)
     .text;
@@ -429,6 +430,11 @@ export const toggleStar = alert => {
     alert.starred = toggledStar;
   });
 };
+
+export const getAlertStatus = alertSummary =>
+  Object.entries(alertSummaryStatus).find(
+    item => alertSummary.status === item[1],
+  )[0];
 
 let issueTrackers; // will cache on first AlertSummary call
 

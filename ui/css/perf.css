@@ -448,6 +448,7 @@ td.alert-confidence {
   width: 100px;
 }
 
+/* TODO remove these
 /* Various styles for individual alerts ("changes" in UI) */
 .alert-untriaged {
   color: #3c763d;

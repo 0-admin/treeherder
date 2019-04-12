@@ -8,6 +8,8 @@ import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { update } from '../../helpers/http';
 import { getApiUrl } from '../../helpers/url';
 import { endpoints } from '../constants';
+import { getAlertStatus } from '../helpers';
+import SimpleToolTip from '../../shared/SimpleTooltip';
 
 // TODO remove $stateParams and $state after switching to react router
 export default class AlertTableRow extends React.Component {
@@ -49,10 +51,22 @@ export default class AlertTableRow extends React.Component {
   render() {
     const { user, alert } = this.props;
     const { starred } = this.state;
-
+    // TODO turn into a helper
+    const alertStatus = getAlertStatus(alert);
+    const tooltipText = alert.classifier_email
+      ? `Classified by ${alert.classifier_email}`
+      : 'Classified automatically';
+    
+    let statusColor = '';
+    if (alertStatus === 'invalid') {
+      statusColor = 'text-danger';
+    }
+    if (alertStatus === 'untriaged') {
+      statusColor = 'text-success';
+    }
     return (
       <tr className="alert-row">
-        <td>
+        <td className="alert-checkbox">
           <FormGroup check>
             <Label check>
               <Input
@@ -73,6 +87,32 @@ export default class AlertTableRow extends React.Component {
               icon={starred ? faStarSolid : faStarRegular}
             />
           </span>
+        </td>
+        {/* <td class="alert-title">
+          <span ng-show="alert.related_summary_id">
+            <!-- Reassigned or downstream *to* another alert -->
+            <span ng-if="alert.related_summary_id !== alertSummary.id">
+              to <a href="#/alerts?id={{alert.related_summary_id}}" target="_blank" rel="noopener">alert #{{alert.related_summary_id}}</a>
+            </span>
+            <!-- Reassigned or downstream *from* the another alert -->
+            <span ng-if="alert.related_summary_id === alertSummary.id">
+              from <a href="#/alerts?id={{alert.summary_id}}" target="_blank" rel="noopener" >alert #{{alert.summary_id}}</a>
+            </span>
+          </span>)&nbsp;&nbsp;
+          <span class="result-links">
+            <a href="{{getGraphsURL(alert, alertSummary.resultSetMetadata.timeRange, alertSummary.repository, alertSummary.framework)}}" target="_blank" rel="noopener">graph</a>
+            <span ng-if="alert.series_signature.has_subtests"> · </span>
+            <a ng-if="alert.series_signature.has_subtests" href="{{getSubtestsURL(alert, alertSummary)}}" target="_blank" rel="noopener">subtests</a>
+          </span>
+        </td> */}
+        <td className="alert-title">
+          {alertStatus !== 'untriaged' ? (
+            <SimpleToolTip text={alert.title} tooltipText={tooltipText} />
+          ) : (
+            <span>{alert.title}</span>
+          )}
+          {' '}
+          (<span className={statusColor}>{alertStatus}</span>)
         </td>
       </tr>
     );
