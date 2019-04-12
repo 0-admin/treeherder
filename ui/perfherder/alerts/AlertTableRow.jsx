@@ -97,7 +97,7 @@ export default class AlertTableRow extends React.Component {
   render() {
     const { user, alert } = this.props;
     const { starred } = this.state;
-    // TODO turn into a helper
+
     const alertStatus = getAlertStatus(alert);
     const tooltipText = alert.classifier_email
       ? `Classified by ${alert.classifier_email}`
@@ -113,9 +113,6 @@ export default class AlertTableRow extends React.Component {
                 disabled={!user.isStaff}
                 // onClick={() => console.log('selected')}
               />
-              {/* <span className="alert-labels" onClick={(event) => { event.preventDefault(); this.setState({ starred : !starred }) }}>
-                <FontAwesomeIcon title={starred ? "starred" : "not starred"} icon={starred ? faStarSolid : faStarRegular} />
-              </span> */}
             </Label>
           </FormGroup>
         </td>
@@ -127,13 +124,6 @@ export default class AlertTableRow extends React.Component {
             />
           </span>
         </td>
-        {/* <td class="alert-title">
-          <span class="result-links">
-            <a href="{{getGraphsURL(alert, alertSummary.resultSetMetadata.timeRange, alertSummary.repository, alertSummary.framework)}}" target="_blank" rel="noopener">graph</a>
-            <span ng-if="alert.series_signature.has_subtests"> · </span>
-            <a ng-if="alert.series_signature.has_subtests" href="{{getSubtestsURL(alert, alertSummary)}}" target="_blank" rel="noopener">subtests</a>
-          </span>
-        </td> */}
         <td className="alert-title">
           {alertStatus !== 'untriaged' ? (
             <SimpleToolTip
@@ -150,9 +140,16 @@ export default class AlertTableRow extends React.Component {
 }
 
 AlertTableRow.propTypes = {
-  alertSummary: PropTypes.shape({}).isRequired,
+  alertSummary: PropTypes.shape({
+    repository: PropTypes.string,
+    framework: PropTypes.number,
+    resultSetMetadata: PropTypes.shape({}),
+    id: PropTypes.number,
+  }).isRequired,
   user: PropTypes.shape({}),
-  alert: PropTypes.shape({}).isRequired,
+  alert: PropTypes.shape({
+    starred: PropTypes.bool,    
+  }).isRequired,
 };
 
 AlertTableRow.defaultProps = {
