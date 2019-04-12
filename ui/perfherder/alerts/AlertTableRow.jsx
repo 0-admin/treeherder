@@ -134,10 +134,19 @@ export default class AlertTableRow extends React.Component {
             <span>{this.getTitleText(alert, alertStatus)}</span>
           )}
         </td>
+        <td className="alert-value">{new Intl.NumberFormat().format(alert.prev_value)}</td>
+        <td className="alert-comparison">
+          <span className={alert.is_regression ? "text-danger" : "text-success"}>
+            {alert.prev_value < alert.new_value && <span>&lt;</span>}
+            {alert.prev_value > alert.new_value && <span>&gt;</span>}
+          </span>
+        </td>
+        <td>{new Intl.NumberFormat().format(alert.new_value)}</td>
       </tr>
     );
   }
 }
+{/* <td class="alert-pct-difference"><span class="detail-hint" uib-tooltip="Absolute difference: {{alert.amount_abs}}">{{alert.amount_pct}}%</span></td> */}
 
 AlertTableRow.propTypes = {
   alertSummary: PropTypes.shape({
