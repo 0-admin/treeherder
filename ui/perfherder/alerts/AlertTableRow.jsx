@@ -8,7 +8,7 @@ import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { update } from '../../helpers/http';
 import { getApiUrl } from '../../helpers/url';
 import { endpoints } from '../constants';
-import { getAlertStatus } from '../helpers';
+import { getAlertStatus, getSubtestsURL, getGraphsURL } from '../helpers';
 import SimpleToolTip from '../../shared/SimpleTooltip';
 
 // TODO remove $stateParams and $state after switching to react router
@@ -63,12 +63,15 @@ export default class AlertTableRow extends React.Component {
           href={`#/alerts?id=${alertId}`}
           target="_blank"
           rel="noopener noreferrer"
+          className="text-info"
         >{`alert #${alertId}`}</a>
       </span>
     );
   };
 
   getTitleText = (alert, alertStatus) => {
+    const { repository, framework, resultSetMetadata } = this.props.alertSummary;
+  
     let statusColor = '';
     if (alertStatus === 'invalid') {
       statusColor = 'text-danger';
@@ -81,13 +84,18 @@ export default class AlertTableRow extends React.Component {
       <span>
         {`${alert.title} (`}
         <span className={statusColor}>{alertStatus}</span>
-        {alert.related_summary_id && this.getReassignment(alert)})
+        {alert.related_summary_id && this.getReassignment(alert)}){' '}
+        <span className="result-links">
+          <a href={getGraphsURL(alert, resultSetMetadata.timeRange, repository, framework)} target="_blank" rel="noopener noreferrer"> graph</a>
+          {alert.series_signature.has_subtests &&
+          <a href={getSubtestsURL(alert, this.props.alertSummary)} target="_blank" rel="noopener noreferrer"> · subtests</a>}
+        </span>
       </span>
     );
   };
 
   render() {
-    const { user, alert, alertSummary } = this.props;
+    const { user, alert } = this.props;
     const { starred } = this.state;
     // TODO turn into a helper
     const alertStatus = getAlertStatus(alert);

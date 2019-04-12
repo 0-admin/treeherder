@@ -265,6 +265,7 @@ export const getCounterMap = function getCounterMap(
   return cmap;
 };
 
+// TODO look into using signature_id instead of the hash
 export const getGraphsLink = function getGraphsLink(
   seriesList,
   resultSets,
@@ -367,6 +368,7 @@ export const getAlertStatusText = alert =>
   Object.values(phAlertStatusMap).find(status => status.id === alert.status)
     .text;
 
+// TODO look into using signature_id instead of the hash
 export const getGraphsURL = (
   alert,
   timeRange,
@@ -397,7 +399,6 @@ export const getGraphsURL = (
 };
 
 export const getSubtestsURL = (alert, alertSummary) => {
-  const endpoint = '#/comparesubtest';
   const urlParameters = {
     framework: alertSummary.framework,
     originalProject: alertSummary.repository,
@@ -413,7 +414,7 @@ export const getSubtestsURL = (alert, alertSummary) => {
     urlParameters.newRevision = alertSummary.resultSetMetadata.revision;
   }
 
-  return `${endpoint}${createQueryParams(urlParameters)}`;
+  return `#/comparesubtest${createQueryParams(urlParameters)}`;
 };
 
 const modifyAlert = (alert, modification) =>

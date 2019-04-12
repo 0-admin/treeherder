@@ -45,7 +45,7 @@ export class AlertTable extends React.Component {
     return (
       <Container fluid className="px-0">
         <Form>
-          <Table>
+          <Table className="compare-table">
             <thead>
               <tr className="bg-lightgray">
                 <th
